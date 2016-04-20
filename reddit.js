@@ -1,7 +1,48 @@
 var request = require('request');
 var util = require("util");
 
-//console.log(util.inspect(x, { showHidden: true, depth: null, colors: true })
+var inquirer = require('inquirer');
+
+var menuChoices = [{
+  name: 'Show homepage',
+  value: 'HOMEPAGE'
+}, {
+  name: 'Show subreddit',
+  value: 'SUBREDDIT'
+}, {
+  name: 'List subreddits',
+  value: 'SUBREDDITS'
+}];
+
+function myApp() {
+  inquirer.prompt({
+    type: 'list',
+    name: 'menu',
+    message: 'What do you want to do?',
+    choices: menuChoices
+  }).then(
+    function(answers) {
+      if (answers.menu === "HOMEPAGE") {
+        var homepageObj = {
+          post: {
+            title: [], 
+            url: []
+            },
+        };
+        getHomepage(function(res) {
+          res.forEach(function(x, i){
+            homepageObj.post.title.push(x.data.title.substr(0,60) + "...");
+            homepageObj.post.url.push(x.data.url);
+          });
+          console.log(homepageObj);
+        });
+      }
+    }
+  );
+}
+
+myApp();
+
 
 /*
 This function should "return" the default homepage posts as an array of objects
@@ -17,9 +58,6 @@ function getHomepage(callback) {
   });
 }
 
-// getHomepage(function(x){
-// console.log(util.inspect(x, { showHidden: true, depth: 1, colors: true }));
-// });
 
 /*
 This function should "return" the default homepage posts as an array of objects.
@@ -96,7 +134,7 @@ This function should "return" all the popular subreddits
 function getSubreddits(callback) {
   // Load reddit.com/subreddits.json and call back with an array of subreddits
   var address = "http://www.reddit.com/subreddits.json";
-  request(address, function(err, result){
+  request(address, function(err, result) {
     var resultObject = JSON.parse(result.body);
     var resultArray = resultObject.data.children;
     callback(resultArray);
@@ -115,5 +153,5 @@ module.exports = {
   getSubreddit: getSubreddit,
   getSortedSubreddit: getSortedSubreddit,
   getSubreddits: getSubreddits
-  // ...
+    // ...
 };
