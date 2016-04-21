@@ -23,21 +23,17 @@ function myApp() {
   }).then(
     function(answers) {
       if (answers.menu === "HOMEPAGE") {
-        var homepageObj = {
-          post: {
-            title: [], 
-            url: []
-            },
-        };
+        var homepageObj = {};
         getHomepage(function(res) {
-          res.forEach(function(x, i){
-            homepageObj.post.title.push(x.data.title.substr(0,60) + "...");
-            homepageObj.post.url.push(x.data.url);
+          res.forEach(function(x, i) {
+            homepageObj["Post " + i] = {title: x.data.title.substr(0,60) + "...", url: x.data.url, author: x.data.author, score: x.data.score};
           });
           console.log(homepageObj);
         });
       }
-    }
+      else if (answers.menu === "SUBREDDIT"){
+        }  
+      }
   );
 }
 
