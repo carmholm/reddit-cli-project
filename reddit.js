@@ -28,33 +28,61 @@ function myApp() {
         var homepageObj = {};
         getHomepage(function(res) {
           res.forEach(function(x, i) {
-            homepageObj["Post " + i] = {title: x.data.title.substr(0,60) + "...", url: x.data.url, author: x.data.author, score: x.data.score};
+            homepageObj["Post " + i] = {
+              title: x.data.title.substr(0, 60) + "...",
+              url: x.data.url,
+              author: x.data.author,
+              score: x.data.score
+            };
           });
           console.log(homepageObj);
           myApp();
         });
       }
-      else if (answers.menu === "SUBREDDIT"){
-        prompt.get(['subreddit'], function(err, result){
-            var subreddit = result.subreddit; 
-            var subredditObj = {};
-            console.log(subreddit);
-        getSubreddit(subreddit, function(arr){
-          arr.forEach(function(x, i){
-            subredditObj[subreddit + " " + i] = {title: x.data.title.substr(0,60) + "..."};
-          });
-          console.log(subredditObj);
-          myApp();
+      else if (answers.menu === "SUBREDDIT") {
+        prompt.get(['subreddit'], function(err, result) {
+          var subreddit = result.subreddit;
+          var subredditObj = {};
+          console.log(subreddit);
+          getSubreddit(subreddit, function(arr) {
+            arr.forEach(function(x, i) {
+              subredditObj[subreddit + " " + i] = {
+                title: x.data.title.substr(0, 60) + "..."
+              };
+            });
+            console.log(subredditObj);
+            myApp();
           });
         });
       }
-      else if (answers.menu === "SUBREDDITS"){
-        var subredditsObj = {};
-        getSubreddits(function(arr){
-          arr.forEach(function(x, i){
-            subredditsObj["Subreddit " + i] = {title: x.data.title.substr(0,60)};
+      else if (answers.menu === "SUBREDDITS") {
+        var subredditsObj = [];
+        getSubreddits(function(arr) {
+          arr.forEach(function(x, i) {
+            subredditsObj[i] = {
+              name: x.data.display_name,
+              value: x.data.display_name
+            };
           });
-          console.log(subredditsObj);
+          // console.log(subredditsObj);
+          inquirer.prompt({
+            type: 'list',
+            name: 'menu',
+            message: 'Choose a subreddit',
+            choices: subredditsObj
+          }).then(function(answer) {
+            var subredditChoice = answer.menu;
+            // console.log(subredditChoice);
+            var newSubredditObj = {};
+            getSubreddit(subredditChoice, function(arr) {
+              arr.forEach(function(x, i) {
+                newSubredditObj[subredditChoice + " " + i] = {
+                  title: x.data.title.substr(0, 60)
+                };
+              });
+              console.log(newSubredditObj);
+            });
+          });
         });
       }
     }
