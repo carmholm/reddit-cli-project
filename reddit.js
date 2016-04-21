@@ -1,5 +1,7 @@
+var prompt = require('prompt');
 var request = require('request');
 var util = require("util");
+prompt.start();
 
 var inquirer = require('inquirer');
 
@@ -29,11 +31,33 @@ function myApp() {
             homepageObj["Post " + i] = {title: x.data.title.substr(0,60) + "...", url: x.data.url, author: x.data.author, score: x.data.score};
           });
           console.log(homepageObj);
+          myApp();
         });
       }
       else if (answers.menu === "SUBREDDIT"){
-        }  
+        prompt.get(['subreddit'], function(err, result){
+            var subreddit = result.subreddit; 
+            var subredditObj = {};
+            console.log(subreddit);
+        getSubreddit(subreddit, function(arr){
+          arr.forEach(function(x, i){
+            subredditObj[subreddit + " " + i] = {title: x.data.title.substr(0,60) + "..."};
+          });
+          console.log(subredditObj);
+          myApp();
+          });
+        });
       }
+      else if (answers.menu === "SUBREDDITS"){
+        var subredditsObj = {};
+        getSubreddits(function(arr){
+          arr.forEach(function(x, i){
+            subredditsObj["Subreddit " + i] = {title: x.data.title.substr(0,60)};
+          });
+          console.log(subredditsObj);
+        });
+      }
+    }
   );
 }
 
@@ -87,8 +111,7 @@ This function should "return" the posts on the front page of a subreddit as an a
 function getSubreddit(subreddit, callback) {
   // Load reddit.com/r/{subreddit}.json and call back with the array of posts
   var address = "http://www.reddit.com/r/";
-  var addressSubreddit = address + subreddit + ".json";
-
+  var addressSubreddit = address + subreddit + "/.json";
   request(addressSubreddit, function(err, result) {
     var resultObject = JSON.parse(result.body);
     var resultArray = resultObject.data.children;
