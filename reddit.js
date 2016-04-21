@@ -29,7 +29,7 @@ function myApp() {
         getHomepage(function(res) {
           res.forEach(function(x, i) {
             homepageObj["Post " + i] = {
-              title: x.data.title.substr(0, 60) + "...",
+              title: x.data.title.substr(0, 60),
               url: x.data.url,
               author: x.data.author,
               score: x.data.score
@@ -47,7 +47,10 @@ function myApp() {
           getSubreddit(subreddit, function(arr) {
             arr.forEach(function(x, i) {
               subredditObj[subreddit + " " + i] = {
-                title: x.data.title.substr(0, 60) + "..."
+                title: x.data.title.substr(0, 60),
+                url: x.data.url,
+                author: x.data.author,
+                score: x.data.score
               };
             });
             console.log(subredditObj);
@@ -64,24 +67,33 @@ function myApp() {
               value: x.data.display_name
             };
           });
-          // console.log(subredditsObj);
+          subredditsObj.unshift(new inquirer.Separator(),'HOMEPAGE', new inquirer.Separator());
           inquirer.prompt({
             type: 'list',
             name: 'menu',
             message: 'Choose a subreddit',
             choices: subredditsObj
-          }).then(function(answer) {
+          })
+          .then(function(answer) {
             var subredditChoice = answer.menu;
-            // console.log(subredditChoice);
             var newSubredditObj = {};
+            if(answer.menu === "HOMEPAGE"){
+              myApp();
+            }
+            else {
             getSubreddit(subredditChoice, function(arr) {
               arr.forEach(function(x, i) {
                 newSubredditObj[subredditChoice + " " + i] = {
-                  title: x.data.title.substr(0, 60)
+                  title: x.data.title.substr(0, 60),
+                  url: x.data.url,
+                  author: x.data.author,
+                  score: x.data.score
                 };
               });
               console.log(newSubredditObj);
+              myApp();
             });
+            }
           });
         });
       }
