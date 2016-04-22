@@ -1,6 +1,7 @@
 const imageToAscii = require("image-to-ascii");
 var prompt = require('prompt');
 var request = require('request');
+var colors = require('colors');
 var util = require("util");
 prompt.start();
 
@@ -40,16 +41,19 @@ function myApp() {
           choices: homepageObj
         }).then(function(answer) {
           var reddit = answer.menu;
-          console.log("Title: " + reddit.title);
-          console.log("Url: " + reddit.url);
-          console.log("Author: " + reddit.author);
-          console.log("Views: " + reddit.score);
-          if(reddit.thumbnail.indexOf('png','img','gif')){
+          console.log("Title".underline.bold + ": " + reddit.title);
+          console.log("Url".underline.bold + ": " + reddit.url);
+          console.log("Author".underline.bold + ": " + reddit.author);
+          console.log("Views".underline.bold + ": " + reddit.score);
+            if(reddit.thumbnail.indexOf('png','img','gif')){
             imageToAscii(reddit.thumbnail, (err, converted) => {
-          console.log(err || converted);
-          });
+            console.log(err || converted);
+            getComments(reddit, function(commentsArray){
+            console.log(commentsArray);
+            myApp();
+            });
+            });
           }
-          myApp();
         });
       });
     }
@@ -71,16 +75,19 @@ function myApp() {
             choices: subredditObj
           }).then(function(answer) {
             var subredditItem = answer.menu;
-            console.log("Title: " + subredditItem.title);
-            console.log("URL: " + subredditItem.url);
-            console.log("Author: " + subredditItem.author);
-            console.log("Views: " + subredditItem.score);
-            if(subredditItem.thumbnail.indexOf('png','img','gif')){
-            imageToAscii(subredditItem.thumbnail, (err, converted) => {
-            console.log(err || converted);
-            });
+            console.log("Title".underline.bold + ": " + subredditItem.title);
+            console.log("Url".underline.bold + ": " + subredditItem.url);
+            console.log("Author".underline.bold + ": " + subredditItem.author);
+            console.log("Views".underline.bold + ": " + subredditItem.score);
+              if(subredditItem.thumbnail.indexOf('png','img','gif')){
+              imageToAscii(subredditItem.thumbnail, (err, converted) => {
+              console.log(err || converted);
+              getComments(subredditItem, function(commentsArray){
+              console.log(commentsArray);
+              myApp();
+              });
+              });
             }
-            myApp();
           });
         });
       });
@@ -122,16 +129,19 @@ function myApp() {
               choices: newSubredditObj
             }).then(function(answer) {
               var subredditItem = answer.menu;
-              console.log("Title: " + subredditItem.title);
-              console.log("URL: " + subredditItem.url);
-              console.log("Author: " + subredditItem.author);
-              console.log("Views: " + subredditItem.score);
-              if(subredditItem.thumbnail.indexOf('png','img','gif')){
-              imageToAscii(subredditItem.thumbnail, (err, converted) => {
-              console.log(err || converted);
-              });
+              console.log("Title".underline.bold + ": " + subredditItem.title);
+              console.log("Url".underline.bold + ": " + subredditItem.url);
+              console.log("Author".underline.bold + ": " + subredditItem.author);
+              console.log("Views".underline.bold + ": " + subredditItem.score);
+                if(subredditItem.thumbnail.indexOf('png','img','gif')){
+                imageToAscii(subredditItem.thumbnail, (err, converted) => {
+                console.log(err || converted);
+                getComments(subredditItem, function(commentsArray){
+                console.log(commentsArray);
+                myApp();
+                });
+                });
               }
-              myApp();
             });
             });
           }
@@ -143,6 +153,21 @@ function myApp() {
 }
 
 myApp();
+
+function getComments(redditArr, callback){
+  var redditCommentURL = "https://www.reddit.com" + redditArr.permalink + ".json";
+  request(redditCommentURL, function(err, result){
+    var resultArray = JSON.parse(result.body);
+    var commentObj = resultArray[1].data.children;
+    var commentsArr = [];
+    commentObj.forEach(function(x ,i){
+      commentsArr.push({
+        comment: x.data.body
+      });
+    });
+    callback(commentsArr);
+  });
+}
 
 
 /*
